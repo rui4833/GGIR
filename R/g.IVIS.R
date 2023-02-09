@@ -39,12 +39,16 @@ g.IVIS = function(Xi, epochsizesecondsXi = 5, IVIS_epochsize_seconds=c(),
           hh2 = aggregate(. ~ hour_perday, data = hh, mean, na.action = na.pass)
           Xh = hh2$Xi
           Xm = suppressWarnings(mean(Xh,na.rm = TRUE)) # Average acceleration per day
-          p = length(which(is.na(Xh) == FALSE))
+          p = length(which(is.na(Xi) == FALSE))
           N = length(Xi[which(is.na(Xi) == FALSE)])
           dat$day = floor(dat$hour/nhr) + 1
-          S = aggregate(dat$Xi, by = list(dat$day), FUN = function(x) sum(diff(c(x))^2))
+          
+          S = aggregate(dat$Xi, by = list(dat$day), FUN = function(x) sum(diff(c(x))^2, na.rm = TRUE))
+          Siv = aggregate(dat$Xi, by = list(dat$day), FUN = function(x) length(which(is.na(diff(c(x))) == FALSE)))
+          Niv = sum(Siv$x, na.rm = TRUE) 
+          
           InterdailyStability = (sum((Xh - Xm)^2, na.rm = TRUE) * N) / (p * sum((Xi - Xm)^2, na.rm = TRUE)) # IS: lower is less synchronized with the 24 hour zeitgeber
-          IntradailyVariability = (sum(S$x, na.rm = TRUE) * N) / ((N - 1) * sum((Xm - Xi)^2, na.rm = TRUE)) #IV: higher is more variability within days (fragmentation)
+          IntradailyVariability = (sum(S$x, na.rm = TRUE) * Niv) / ((N - 1) * sum((Xm - Xi)^2, na.rm = TRUE)) #IV: higher is more variability within days (fragmentation)
         } else {
           hh$hour_perday = hh$hour - (floor(hh$hour / nhr) * nhr) # 24 hour in a day
           hh$day = floor(hh$hour/nhr) + 1
@@ -73,14 +77,21 @@ g.IVIS = function(Xi, epochsizesecondsXi = 5, IVIS_epochsize_seconds=c(),
               hh.t = hh[c(thisday, nextday), ]
               testNA = c(is.na(hh.t$Xi) | is.na(hh.t$Xi))
               Xi = hh.t$Xi
+              
               hh2 = aggregate(. ~ hour_perday, data = hh.t, mean, na.action = na.pass)
               Xh = hh2$Xi
               Xm = suppressWarnings(mean(Xh,na.rm = TRUE))
               p = length(which(is.na(Xh) == FALSE))
               N = length(Xi[which(is.na(Xi) == FALSE)])
+              
               S = aggregate(hh.t$Xi, by = list(hh.t$day), FUN = function(x) sum(diff(c(x))^2, na.rm = TRUE) )
+              
+              Svi = aggregate(hh.t$Xi, by = list(hh.t$day), FUN = function(x) length(which(is.na(diff(c(x))) == FALSE)))
+              Nvi = sum(Svi$x, na.rm = TRUE) # Number of valid diff values across days
+              
               IVIS_daypair_summary$IS[i] = (sum((Xh - Xm)^2, na.rm = TRUE) * N) / (p * sum((Xi - Xm)^2, na.rm = TRUE)) # IS: lower is less synchronized with the 24 hour zeitgeber
-              IVIS_daypair_summary$IV[i] = (sum(S$x, na.rm = TRUE) * N) / ((N - 1) * sum((Xm - Xi)^2, na.rm = TRUE)) #IV: higher is more variability within days (fragmentation)
+              IVIS_daypair_summary$IV[i] = (sum(S$x, na.rm = TRUE) * Nvi) / ((N - 1) * sum((Xm - Xi)^2, na.rm = TRUE)) #IV: higher is more variability within days (fragmentation)
+              
               IVIS_daypair_summary$fracvalid[i] = length(which(testNA == FALSE)) / length(testNA)
               IVIS_daypair_summary$daypair[i] = paste0(i, "-", i + 1)
             }
