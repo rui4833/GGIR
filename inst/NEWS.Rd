@@ -1,7 +1,12 @@
 \name{NEWS}
 \title{News for Package \pkg{GGIR}}
 \newcommand{\cpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-\section{Changes in version 2.8-7 (GitHub-only-release date:20-03-2022)}{
+\section{Changes in version 2.8-8 (GitHub-only-release date:??-??-2023)}{
+  \itemize{
+   \item Documentation: improved documentation on the use of acceleration metrics.   
+  }
+}
+\section{Changes in version 2.8-7 (GitHub-only-release date:20-03-2023)}{
   \itemize{
    \item Part 1: Deprecating dependency on GENEAread package, from now onward only
    GGIRread is used for reading GENEActiv binary data #627
