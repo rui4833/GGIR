@@ -151,7 +151,7 @@ GGIR(mode = \Sexpr{format(formals(GGIR::GGIR)[["mode"]])},
         process (whichever is lower), but this argument allows you to set a lower maximum.}
 
       \item{acc.metric}{
-        Boolean (default = \Sexpr{GGIR::load_params()[["params_general"]][["acc.metric"]]}).
+        Character (default = \Sexpr{GGIR::load_params()[["params_general"]][["acc.metric"]]}).
         Which one of the metrics do you want to consider to analyze L5.
         The metric of interest need to be calculated in M (see \link{g.part1}).}
 
