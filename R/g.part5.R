@@ -423,6 +423,7 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
               }
             }
             ts$window = 0
+            backup_DFA_coef_MM = backup_DFA_coef_WW = NULL
             # 2023-04-23 - backup of nightsi outside threshold look to avoid
             # overwriting the backup after the first iteration
             nightsi_bu = nightsi
@@ -913,6 +914,30 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                             ds_names[fi] = "foldername"; fi = fi + 1
                           }
                           di = di + 1
+                        }
+                      }
+                    }
+                    if (params_247[["DFA"]] == TRUE) { 
+                      # Note: This is a crude initial draft.
+                      # need to merge with cosinor analysis when that branch is merged
+                      if ((timewindowi == "MM" & length(backup_DFA_coef_MM) == 0) |
+                          (timewindowi == "WW" & length(backup_DFA_coef_WW) == 0)) {
+                        # avoid computing same parameter twice because this part of the code is
+                        # not dependent on the lig, mod, vig thresholds
+                        acc4cos = ts[which(ts$window != 0), c("time", "ACC")]
+                        acc4cos$ACC  = acc4cos$ACC / 1000 # convert to mg because that is what applyCosinorAnalyses expects
+                        DFA_coef = applyDFA(ts = acc4cos)
+                        rm(acc4cos)
+                        if (timewindowi == "MM") {
+                          backup_DFA_coef_MM = DFA_coef
+                        } else if (timewindowi == "WW") {
+                          backup_DFA_coef_WW = DFA_coef
+                        }
+                      } else {
+                        if (timewindowi == "MM") {
+                          DFA_coef = backup_DFA_coef_MM
+                        } else if (timewindowi == "WW") {
+                          DFA_coef = backup_DFA_coef_WW
                         }
                       }
                     }
