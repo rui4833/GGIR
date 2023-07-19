@@ -8,6 +8,7 @@ createConfigFile = function(config.parameters = c(), GGIRversion = "") {
                                   "params_phyact", "params_rawdata", "params_sleep")
   for (i in 1:length(config.parameters)) {
     NM = names(config.parameters)[i]
+    print(NM)
     if (NM %in% possible_params_objectnames) {
       # Replace NULL values before converting to data.frame
       config.parameters[[i]] <- lapply(config.parameters[[i]], lapply, function(x)ifelse(is.null(x), "c()", x))
