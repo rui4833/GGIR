@@ -2,7 +2,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
                         params_rawdata = c(), params_247 = c(),
                         params_phyact = c(), params_cleaning = c(),
                         params_output = c(), params_general = c()) {
-
+  
   check_class = function(category, params, parnames, parclass) {
     for (parname in parnames) {
       if (length(params[[parname]]) > 0) {
@@ -120,7 +120,8 @@ check_params = function(params_sleep = c(), params_metrics = c(),
     numeric_params = c("maxNcores", "windowsizes", "idloc", "dayborder",
                        "expand_tail_max_hours", "maxRecordingInterval")
     boolean_params = c("overwrite", "print.filename", "do.parallel", "part5_agg2_60seconds")
-    character_params = c("acc.metric", "desiredtz", "configtz", "sensor.location", "dataFormat")
+    character_params = c("acc.metric", "desiredtz", "configtz", "sensor.location", 
+                         "dataFormat", "extEpochData_timeformat")
     check_class("general", params = params_general, parnames = numeric_params, parclass = "numeric")
     check_class("general", params = params_general, parnames = boolean_params, parclass = "boolean")
     check_class("general", params = params_general, parnames = character_params, parclass = "character")
@@ -137,7 +138,7 @@ check_params = function(params_sleep = c(), params_metrics = c(),
   }
   if (length(params_metrics) > 0 & length(params_sleep) > 0) {
     if (length(params_sleep[["def.noc.sleep"]]) != 2) {
-      if (params_sleep[["HASPT.algo"]] != "HorAngle") {
+      if (params_sleep[["HASPT.algo"]] %in% c("HorAngle", "NotWorn") == FALSE) {
         params_sleep[["HASPT.algo"]] = "HDCZA"
       }
     } else if (length(params_sleep[["def.noc.sleep"]]) == 2) {
@@ -353,14 +354,30 @@ check_params = function(params_sleep = c(), params_metrics = c(),
                   assumption is credible."), call. = FALSE)
     }
   }
-
+  
   if (!is.null(params_general[["maxRecordingInterval"]])) {
     if (params_general[["maxRecordingInterval"]] > 24 * 21) {
       stop(paste0("A maxRecordingInterval value higher than 21 days (504 hours) is permitted,",
                   " please specify a lower value."), call. = FALSE)
     }
   }
-
+  
+  # cleaning parameters for segments
+  if (length(params_cleaning) > 0) {
+    if (is.null(params_cleaning[["segmentWEARcrit.part5"]])) {
+      # if null, then assign default value
+      params_cleaning[["segmentWEARcrit.part5"]] = 0.5
+      warning(paste0("\nsegmentWEARcrit.part5 is expected to be a number between 0 and 1",
+                     ", the default value has been assigned (i.e., 0.5) "), call. = FALSE)
+    } else if (params_cleaning[["segmentWEARcrit.part5"]] < 0 | 
+               params_cleaning[["segmentWEARcrit.part5"]] > 1) {
+      stop(paste0("Incorrect value of segmentWEARcrit.part5, this should be a",
+                  "fraction of the day between zero and one, please change."), 
+           call. = FALSE)
+    }
+  }
+  
+  
   invisible(list(params_sleep = params_sleep,
                  params_metrics = params_metrics,
                  params_rawdata = params_rawdata,
