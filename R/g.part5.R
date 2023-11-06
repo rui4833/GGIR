@@ -320,6 +320,19 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
               IDtmp = as.character(ID)
               sibreport = g.sibreport(ts, ID = IDtmp, epochlength = ws3new, logs_diaries,
                                       desiredtz = params_general[["desiredtz"]])
+              
+              # Add self-reported classes to ts object
+              ts$selfreported = NA
+              for (srType in c("sleeplog", "nap", "nonwear")) {
+                sr_index = which(sibreport$type == srType)
+                if (length(sr_index) > 0) {
+                  for (sii in sr_index) {
+                    ts$selfreported[which(ts$time >= sibreport$start[sii] & ts$time < sibreport$end[sii])] = srType
+                  }
+                }
+              }
+              ts$selfreported = as.factor(ts$selfreported)
+
               # store in csv file:
               ms5.sibreport = "/meta/ms5.outraw/sib.reports"
               if (!file.exists(paste(metadatadir, ms5.sibreport, sep = ""))) {
