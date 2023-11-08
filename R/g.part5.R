@@ -577,16 +577,23 @@ g.part5 = function(datadir = c(), metadatadir = c(), f0=c(), f1=c(),
                     if (params_output[["do.sibreport"]] == TRUE & length(params_sleep[["nap_model"]]) > 0) {
                       napNonwear_col = "nap1_nonwear2"
                     } else {
-                      napNonwear_col = c()
+                      napNonwear_col = NULL
                     }
+                    if (params_output[["do.sibreport"]]  == TRUE) {
+                      selfreported_col = "selfreported"
+                    } else {
+                      selfreported_col = NULL
+                    }
+                    
                     if (lightpeak_available == TRUE) {
                       lightpeak_col = "lightpeak"
                     } else {
                       lightpeak_col = NULL
                     }
+                    
                     g.part5.savetimeseries(ts = ts[, c("time", "ACC", "diur", "nonwear",
                                                        "guider", "window", napNonwear_col,
-                                                       lightpeak_col)],
+                                                       lightpeak_col, selfreported_col)],
                                            LEVELS = LEVELS,
                                            desiredtz = params_general[["desiredtz"]],
                                            rawlevels_fname = rawlevels_fname,
