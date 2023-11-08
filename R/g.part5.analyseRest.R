@@ -92,9 +92,11 @@ g.part5.analyseRest = function(sibreport = NULL, dsummary = NULL,
     sibreport = sibreport[longboutsi,]
     srep_tmp = sibreport[which(sibreport$start >= min(ts$time) &
                                  sibreport$end <= max(ts$time)),]
-    # account for possibility that some of these categories do not exist
+    #-----------------------------------------------------------------------------------------
     #	identify overlapping and non-overlapping, (nap-sib, non-wear-sib, sib, nap, nonwear)
     #	calculate for all five categories number, total duration, mean duration
+    # but also account for possibility that some of these categories do not exist
+    
     # for qc purposes:
     dsummary[di,fi] = nrow(srep_tmp)
     ds_names[fi] = "sibreport_n_items_day"
@@ -109,10 +111,6 @@ g.part5.analyseRest = function(sibreport = NULL, dsummary = NULL,
       srep_tmp$SleeplogOverlapSIB = 0
       srep_tmp$start = as.POSIXlt(srep_tmp$start, tz = tz)
       srep_tmp$end = as.POSIXlt(srep_tmp$end, tz = tz)
-      # # for qc purposes:
-      # dsummary[di,fi] = nrow(srep_tmp)
-      # ds_names[fi] = "n_sibs_sibreport"
-      # fi = fi + 1
       if (length(sibs) > 0) {
         classes = unique(srep_tmp$type)
         selfreport = which(srep_tmp$type == "nonwear" | srep_tmp$type == "nap" | srep_tmp$type == "sleeplog") 
@@ -158,6 +156,7 @@ g.part5.analyseRest = function(sibreport = NULL, dsummary = NULL,
           }
         }
       }
+      # Identify where segments overlap
       sibs_indices = which(srep_tmp$type == "sib")
       nap_indices = which(srep_tmp$type == "nap")
       nonwear_indices = which(srep_tmp$type == "nonwear")
@@ -168,6 +167,7 @@ g.part5.analyseRest = function(sibreport = NULL, dsummary = NULL,
       NapOverlapSIB_indices = which(srep_tmp$NapOverlapSIB != 0)
       NonwearOverlapSIB_indices = which(srep_tmp$NonwearOverlapSIB != 0)
       SleeplogOverlapSIB_indices = which(srep_tmp$NonwearOverlapSIB != 0)
+      # Count number of occurances
       dsummary[di,fi:(fi + 8)] = c(length(sibs_indices),
                                    length(nap_indices),
                                    length(nonwear_indices),

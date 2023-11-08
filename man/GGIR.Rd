@@ -1160,7 +1160,9 @@ GGIR(mode = 1:5,
         when argument \code{sleepwindowType = "TimeInBed"}}
         
       \item{possible_nap_edge_acc}{
-        Minimum acceleration before or after the SIB for the nap to be considered.
+        Numeric (default = Inf).
+        Maximum acceleration before or after the SIB for the nap to be considered.
+        By default this will allow all possible naps.
       }
     }
   }
@@ -1371,7 +1373,7 @@ GGIR(mode = 1:5,
         inactivity bouts (SIB). If set to TRUE and when an advanced sleep diary is
         available in part 4 then part 5 will use this to generate summary statistics
         on the overlap between self-reported nonwear and napping with SIB. Here,
-        SIB cna be filter based on argument possible_nap_edge_acc and the first value
+        SIB can be filter based on argument possible_nap_edge_acc and the first value
         of possible_nap_dur}
 
       \item{do.visual}{
